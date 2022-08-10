@@ -3,6 +3,10 @@ package frc.robot.subsystems;
 import com.chopshop166.chopshoplib.commands.SmartSubsystemBase;
 import com.chopshop166.chopshoplib.motors.SmartMotorController;
 
+import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -16,14 +20,16 @@ public class Turret extends SmartSubsystemBase {
     private SmartMotorController motor;
 
     private NetworkTableInstance tableInstance = NetworkTableInstance.getDefault();
+    private NetworkTable camTable = tableInstance.getTable("photonvision").getSubTable("swerveCam");
 
-    private NetworkTable table = tableInstance.getTable("photonvision");
+    private NetworkTableEntry targetEntry = camTable.getEntry("hasTarget");
+    private NetworkTableEntry yawEntry = camTable.getEntry("targetYaw");
 
-    private NetworkTableEntry pitchEntry = table.getEntry("targetPitch");
-    private NetworkTableEntry yawEntry = table.getEntry("targetYaw");
-    private NetworkTableEntry targetEntry = table.getEntry("hasTarget");
+    private PhotonCamera camera = new PhotonCamera("swerveCam");
 
-    private PIDController pid = new PIDController(0.0, 0.0, 0.0);
+    private PIDController pid = new PIDController(0.01, 0.0, 0.0);
+
+    private double ballX = 0.0;
 
     public Turret(TurretMap map) {
         this.motor = map.getMotor();
@@ -31,7 +37,7 @@ public class Turret extends SmartSubsystemBase {
 
     public CommandBase follow() {
         return running("Follow", () -> {
-            motor.set(pid.calculate(pitchEntry.getDouble(0.0)));
+            motor.set(pid.calculate(ballX));
         });
     }
 
@@ -42,9 +48,16 @@ public class Turret extends SmartSubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putBoolean("Sees Target", targetEntry.getBoolean(false));
-        SmartDashboard.putNumber("Target Pitch", pitchEntry.getDouble(0.0));
-        SmartDashboard.putNumber("Target Yaw", yawEntry.getDouble(0.0));
+
+        // PhotonPipelineResult result = camera.getLatestResult();
+        boolean hasTargets = targetEntry.getBoolean(false);
+
+        SmartDashboard.putBoolean("Sees Target", hasTargets);
+        if (hasTargets) {
+            ballX = yawEntry.getDouble(0.0);
+        }
+        SmartDashboard.putNumber("Target Yaw", ballX);
+
     }
 
     @Override
