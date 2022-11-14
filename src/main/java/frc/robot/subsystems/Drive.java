@@ -136,7 +136,6 @@ public class Drive extends SmartSubsystemBase {
     @Override
     public void periodic() {
 
-
         PhotonPipelineResult result = camera.getLatestResult();
 
         if (result.hasTargets()) {
@@ -152,9 +151,14 @@ public class Drive extends SmartSubsystemBase {
             double targetX = Units.inchesToMeters(64);
 
             Pose2d robotPose = PhotonUtils.estimateFieldToRobot(
-                    cameraHeight, targetHeight, cameraPitch, target.getPitch(), new Rotation2d(target.getYaw()),
-                    Rotation2d.fromDegrees(gyro.getAngle()),
-                    new Pose2d(targetX, 0, Rotation2d.fromDegrees(0)), new Transform2d());
+                    cameraHeight,
+                    targetHeight,
+                    cameraPitch,
+                    0.0,
+                    Rotation2d.fromDegrees(-target.getYaw()),
+                    gyro.getRotation2d(),
+                    new Pose2d(targetX, 0, Rotation2d.fromDegrees(0)),
+                    new Transform2d());
 
             SmartDashboard.putNumber("robotX", robotPose.getX());
             SmartDashboard.putNumber("robotY", robotPose.getY());
