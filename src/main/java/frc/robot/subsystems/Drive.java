@@ -154,15 +154,15 @@ public class Drive extends SmartSubsystemBase {
                     cameraHeight,
                     targetHeight,
                     cameraPitch,
-                    0.0,
-                    Rotation2d.fromDegrees(-target.getYaw()),
+                    Units.degreesToRadians(target.getPitch()),
+                    Rotation2d.fromDegrees(target.getYaw()),
                     gyro.getRotation2d(),
                     new Pose2d(targetX, 0, Rotation2d.fromDegrees(0)),
                     new Transform2d());
 
             SmartDashboard.putNumber("robotX", robotPose.getX());
             SmartDashboard.putNumber("robotY", robotPose.getY());
-
+            SmartDashboard.putNumber("robotAngle", robotPose.getRotation().getRadians());
         } else {
             SmartDashboard.putNumber("robotX", 0);
             SmartDashboard.putNumber("robotY", 0);
