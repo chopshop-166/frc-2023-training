@@ -3,9 +3,9 @@ package frc.robot.util;
 import edu.wpi.first.math.geometry.Pose2d;
 
 public class AprilTag {
-    private int id;
-    private Pose2d fieldPose;
-    private double heightMeters;
+    private final int id;
+    private final Pose2d fieldPose;
+    private final double heightMeters;
 
     public AprilTag(int id, Pose2d fieldPose, double heightMeters) {
         this.id = id;

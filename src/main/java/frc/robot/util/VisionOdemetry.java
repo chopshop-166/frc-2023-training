@@ -10,22 +10,27 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class VisionOdemetry {
 
-    private TagField fieldTags;
-    private PhotonCamera camera;
+    private final TagField fieldTags;
+    private final PhotonCamera camera;
 
-    private boolean positionKnown;
+    private boolean positionKnown = false;
     private Pose2d tagEstimatedPose;
 
-    public VisionOdemetry(String photonName, TagField tags) {
+    private final Translation3d cameraToRobot;
+    private final Rotation2d cameraPitch;
+
+    public VisionOdemetry(String photonName, Translation3d cameraToRobot, Rotation2d cameraPitch, TagField tags) {
         fieldTags = tags;
         camera = new PhotonCamera(NetworkTableInstance.getDefault(), photonName);
-        positionKnown = false;
-
         tagEstimatedPose = new Pose2d();
+        this.cameraToRobot = cameraToRobot;
+        this.cameraPitch = cameraPitch;
+
     }
 
     public void update() {

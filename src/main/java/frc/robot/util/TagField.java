@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class TagField {
 
-    private HashMap<Integer, AprilTag> tags = new HashMap<Integer, AprilTag>();
+    private final HashMap<Integer, AprilTag> tags = new HashMap<Integer, AprilTag>();
 
     public TagField(AprilTag... tags) {
         for (AprilTag tag : tags) {
