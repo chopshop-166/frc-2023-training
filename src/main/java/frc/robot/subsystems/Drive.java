@@ -9,13 +9,11 @@ import com.chopshop166.chopshoplib.motors.Modifier;
 import com.chopshop166.chopshoplib.sensors.gyro.SmartGyro;
 
 import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
-import org.photonvision.targeting.PhotonPipelineResult;
-import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -23,6 +21,9 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.util.AprilTag;
+import frc.robot.util.TagField;
+import frc.robot.util.VisionOdemetry;
 
 public class Drive extends SmartSubsystemBase {
 
@@ -44,6 +45,8 @@ public class Drive extends SmartSubsystemBase {
     private double rotationOffset = 0.0;
     private double startingRotation = 0.0;
 
+    private final VisionOdemetry vision;
+
     public Drive(final SwerveDriveMap map) {
         super();
 
@@ -56,6 +59,14 @@ public class Drive extends SmartSubsystemBase {
         gyro = map.getGyro();
         maxDriveSpeedMetersPerSecond = map.getMaxDriveSpeedMetersPerSecond();
         maxRotationRadiansPerSecond = map.getMaxRotationRadianPerSecond();
+
+        vision = new VisionOdemetry("gloworm", map, new Translation3d(), new Rotation2d(),
+                new TagField(
+                        new AprilTag(0, new Pose2d(
+                                Units.inchesToMeters(64),
+                                0,
+                                Rotation2d.fromDegrees(180)),
+                                Units.inchesToMeters(48))));
 
     }
 
@@ -83,8 +94,6 @@ public class Drive extends SmartSubsystemBase {
 
     private void updateSwerveSpeedAngle(final DoubleSupplier translateX, final DoubleSupplier translateY,
             final DoubleSupplier rotation) {
-        // Need to convert inputs from -1..1 scale to m/s
-        SmartDashboard.putNumber("Rotation Offset", rotationOffset);
         final Modifier deadband = Modifier.deadband(0.15);
         final double translateXSpeed = deadband.applyAsDouble(translateX.getAsDouble()) * maxDriveSpeedMetersPerSecond
                 * speedCoef;
@@ -135,41 +144,11 @@ public class Drive extends SmartSubsystemBase {
 
     @Override
     public void periodic() {
-
-        PhotonPipelineResult result = camera.getLatestResult();
-
-        if (result.hasTargets()) {
-            PhotonTrackedTarget target = result.getBestTarget();
-            // Camera height: 22 in
-            // Target Height: 48 in
-            // Camera Pitch: 27 deg
-
-            double cameraHeight = Units.inchesToMeters(22);
-            double targetHeight = Units.inchesToMeters(48);
-            double cameraPitch = Units.degreesToRadians(27);
-
-            double targetX = Units.inchesToMeters(64);
-
-            Pose2d robotPose = PhotonUtils.estimateFieldToRobot(
-                    cameraHeight,
-                    targetHeight,
-                    cameraPitch,
-                    Units.degreesToRadians(target.getPitch()),
-                    Rotation2d.fromDegrees(target.getYaw()),
-                    gyro.getRotation2d(),
-                    new Pose2d(targetX, 0, Rotation2d.fromDegrees(0)),
-                    new Transform2d());
-
-            SmartDashboard.putNumber("robotX", robotPose.getX());
-            SmartDashboard.putNumber("robotY", robotPose.getY());
-            SmartDashboard.putNumber("robotAngle", robotPose.getRotation().getRadians());
-        } else {
-            SmartDashboard.putNumber("robotX", 0);
-            SmartDashboard.putNumber("robotY", 0);
-        }
-
-        SmartDashboard.putBoolean("Is There A Target?", result.hasTargets());
-
+        vision.update();
+        Pose2d robotPose = vision.getPose();
+        SmartDashboard.putNumber("robotX", robotPose.getX());
+        SmartDashboard.putNumber("robotY", robotPose.getY());
+        SmartDashboard.putNumber("robotAngle", robotPose.getRotation().getRadians());
     }
 
     @Override
