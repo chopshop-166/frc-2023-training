@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import java.util.HashMap;
 import java.util.function.DoubleSupplier;
 
 import com.chopshop166.chopshoplib.commands.SmartSubsystemBase;
@@ -11,7 +12,9 @@ import com.chopshop166.chopshoplib.sensors.gyro.SmartGyro;
 import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -21,8 +24,6 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.util.AprilTag;
-import frc.robot.util.TagField;
 import frc.robot.util.VisionOdemetry;
 
 public class Drive extends SmartSubsystemBase {
@@ -60,13 +61,16 @@ public class Drive extends SmartSubsystemBase {
         maxDriveSpeedMetersPerSecond = map.getMaxDriveSpeedMetersPerSecond();
         maxRotationRadiansPerSecond = map.getMaxRotationRadianPerSecond();
 
-        vision = new VisionOdemetry("gloworm", map, new Translation3d(), new Rotation2d(),
-                new TagField(
-                        new AprilTag(0, new Pose2d(
-                                Units.inchesToMeters(64),
-                                0,
-                                Rotation2d.fromDegrees(180)),
-                                Units.inchesToMeters(48))));
+        Transform3d cameraToRobot = new Transform3d(
+                new Translation3d(0, 0, 0),
+                new Rotation3d(0, Units.degreesToRadians(26), 0));
+
+        HashMap<Integer, Pose3d> aprilTags = new HashMap<>();
+        aprilTags.put(0, new Pose3d(
+                new Translation3d(),
+                new Rotation3d(0, 0, Math.PI)));
+
+        vision = new VisionOdemetry("gloworm", map, cameraToRobot, aprilTags);
 
     }
 
