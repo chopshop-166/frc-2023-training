@@ -62,7 +62,7 @@ public class Drive extends SmartSubsystemBase {
         maxRotationRadiansPerSecond = map.getMaxRotationRadianPerSecond();
 
         Transform3d cameraToRobot = new Transform3d(
-                new Translation3d(0, 0, 0),
+                new Translation3d(Units.inchesToMeters(64), 0, Units.inchesToMeters(48)),
                 new Rotation3d(0, Units.degreesToRadians(26), 0));
 
         HashMap<Integer, Pose3d> aprilTags = new HashMap<>();
