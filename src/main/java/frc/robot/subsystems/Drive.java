@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -24,6 +25,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.util.DrivePID;
 import frc.robot.util.VisionOdemetry;
 
 public class Drive extends SmartSubsystemBase {
@@ -46,11 +48,14 @@ public class Drive extends SmartSubsystemBase {
     private double rotationOffset = 0.0;
     private double startingRotation = 0.0;
 
-    private final VisionOdemetry vision;
+    private final VisionOdemetry odometry;
+    private Pose2d robotPose = new Pose2d();
 
-    public Drive(final SwerveDriveMap map) {
+    DrivePID drivePid = new DrivePID(0, 0, 0, 0, 0, 0);
+
+    public Drive(
+            final SwerveDriveMap map) {
         super();
-
         frontLeft = map.getFrontLeft();
         frontRight = map.getFrontRight();
         rearLeft = map.getRearLeft();
@@ -62,15 +67,16 @@ public class Drive extends SmartSubsystemBase {
         maxRotationRadiansPerSecond = map.getMaxRotationRadianPerSecond();
 
         Transform3d cameraToRobot = new Transform3d(
-                new Translation3d(Units.inchesToMeters(64), 0, Units.inchesToMeters(48)),
+                new Translation3d(0, 0, 0),
                 new Rotation3d(0, Units.degreesToRadians(26), 0));
 
         HashMap<Integer, Pose3d> aprilTags = new HashMap<>();
         aprilTags.put(0, new Pose3d(
-                new Translation3d(),
+                new Translation3d(Units.inchesToMeters(64), 0, Units.inchesToMeters(
+                        48)),
                 new Rotation3d(0, 0, Math.PI)));
 
-        vision = new VisionOdemetry("gloworm", map, cameraToRobot, aprilTags);
+        odometry = new VisionOdemetry("gloworm", map, cameraToRobot, aprilTags);
 
     }
 
@@ -94,6 +100,17 @@ public class Drive extends SmartSubsystemBase {
             final DoubleSupplier rotation) {
         return running("Field Centric Drive",
                 () -> updateSwerveSpeedAngle(translateX, translateY, rotation));
+    }
+
+    public CommandBase driveTo(Pose2d targetPose) {
+        return cmd("Drive To").onExecute(() -> {
+            Transform2d velocities = drivePid.calculate(robotPose, targetPose);
+            updateSwerveSpeedAngle(velocities::getX, velocities::getY, () -> velocities.getRotation().getRadians());
+
+        }).runsUntil(() -> drivePid.getError(robotPose, targetPose) < 0.1).onEnd(
+                () -> {
+                    updateSwerveSpeedAngle(() -> 0, () -> 0, () -> 0);
+                });
     }
 
     private void updateSwerveSpeedAngle(final DoubleSupplier translateX, final DoubleSupplier translateY,
@@ -148,8 +165,8 @@ public class Drive extends SmartSubsystemBase {
 
     @Override
     public void periodic() {
-        vision.update();
-        Pose2d robotPose = vision.getPose();
+        odometry.update();
+        robotPose = odometry.getPose();
         SmartDashboard.putNumber("robotX", robotPose.getX());
         SmartDashboard.putNumber("robotY", robotPose.getY());
         SmartDashboard.putNumber("robotAngle", robotPose.getRotation().getRadians());
