@@ -9,6 +9,9 @@
     "linux": {
         "command": "./gradlew"
     },
+    "osx": {
+        "command": "./gradlew"
+    },
     "group": "none",
     "problemMatcher": [],
     "tasks": [
