@@ -10,6 +10,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Counter;
+import frc.robot.subsystems.Drive;
 
 public class Robot extends CommandRobot {
 
@@ -18,6 +19,8 @@ public class Robot extends CommandRobot {
     private Auto auto = new Auto();
 
     private Claw claw = new Claw();
+
+    private Drive drive = new Drive();
 
     @Autonomous(defaultAuto = true)
     public CommandBase exampleAuto = auto.exampleAuto();
@@ -37,7 +40,7 @@ public class Robot extends CommandRobot {
     @Override
     public void configureButtonBindings() {
         controller.rbumper().whenPressed(claw.open()).whenReleased(claw.close());
-
+        controller.start().toggleWhenPressed(drive.tankDrive(controller::getLeftY, controller::getRightY));
     }
 
     @Override
@@ -47,6 +50,6 @@ public class Robot extends CommandRobot {
 
     @Override
     public void setDefaultCommands() {
-
+        drive.setDefaultCommand(drive.drive(controller::getTriggers, controller::getRightX));
     }
 }
