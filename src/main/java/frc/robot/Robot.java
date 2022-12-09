@@ -1,16 +1,27 @@
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import com.chopshop166.chopshoplib.Autonomous;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
+import com.chopshop166.chopshoplib.controls.ButtonXboxController;
+
+
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Claw;
+import frc.robot.subsystems.Drive;
 
 public class Robot extends CommandRobot {
 
     private Auto auto = new Auto();
+    private Claw claw = new Claw();
+    private Drive drive = new Drive();
 
     @Autonomous(defaultAuto = true)
     public CommandBase exampleAuto = auto.exampleAuto();
+
+    private ButtonXboxController controller = new ButtonXboxController(0);
 
     @Override
     public void teleopInit() {
@@ -24,6 +35,8 @@ public class Robot extends CommandRobot {
 
     @Override
     public void configureButtonBindings() {
+        controller.a().whenPressed(claw.open()).whenReleased(claw.close());
+        controller.start().toggleWhenPressed(drive.tankDrive(controller::getLeftY, controller::getRightY))
 
     }
 
@@ -34,6 +47,7 @@ public class Robot extends CommandRobot {
 
     @Override
     public void setDefaultCommands() {
+        drive.setDefaultCommand(drive.drive(controller::getTriggers, controller::getLeftX ));
 
     }
 }
