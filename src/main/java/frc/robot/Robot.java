@@ -4,10 +4,14 @@ import com.chopshop166.chopshoplib.Autonomous;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.maps.RobotMap;
 
 public class Robot extends CommandRobot {
 
     private Auto auto = new Auto();
+    private RobotMap map = new RobotMap();
+
+    // Subsystems
 
     @Autonomous(defaultAuto = true)
     public CommandBase exampleAuto = auto.exampleAuto();
