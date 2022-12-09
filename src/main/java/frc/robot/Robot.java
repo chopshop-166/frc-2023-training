@@ -8,10 +8,16 @@ import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
+import frc.robot.subsystems.Claw;
+import frc.robot.subsystems.Counter;
 
 public class Robot extends CommandRobot {
 
+    private Counter counter = new Counter();
+
     private Auto auto = new Auto();
+
+    private Claw claw = new Claw();
 
     @Autonomous(defaultAuto = true)
     public CommandBase exampleAuto = auto.exampleAuto();
@@ -30,13 +36,8 @@ public class Robot extends CommandRobot {
 
     @Override
     public void configureButtonBindings() {
-        controller.a().whenPressed(new PrintCommand("Hello, world!"));
-        controller.b().whenPressed(new PrintCommand("Fortnite"));
-        controller.x().whileHeld(startEnd("Foo", () -> {
-            System.out.println("Start");
-        }, () -> {
-            System.out.println("End");
-        }));
+        controller.rbumper().whenPressed(claw.open()).whenReleased(claw.close());
+
     }
 
     @Override
