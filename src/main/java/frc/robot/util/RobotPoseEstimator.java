@@ -172,7 +172,7 @@ public class RobotPoseEstimator {
         return Pair.of(
                 aprilTags
                         .get(bestTarget.getFiducialId())
-                        .transformBy(bestTarget.getBestCameraToTarget().inverse())
+                        .transformBy(bestTarget.getCameraToTarget().inverse())
                         .transformBy(cameras.get(lowestAI).getSecond().inverse()),
                 cameras.get(lowestAI).getFirst().getLatestResult().getLatencyMillis());
     }
@@ -199,18 +199,18 @@ public class RobotPoseEstimator {
                 Pose3d targetPose = aprilTags.get(target.getFiducialId());
                 double alternativeDifference = Math.abs(
                         p.getSecond().getZ()
-                                - targetPose.transformBy(target.getAlternateCameraToTarget().inverse()).getZ());
+                                - targetPose.transformBy(target.getCameraToTarget().inverse()).getZ());
                 double bestDifference = Math.abs(
                         p.getSecond().getZ()
-                                - targetPose.transformBy(target.getBestCameraToTarget().inverse()).getZ());
+                                - targetPose.transformBy(target.getCameraToTarget().inverse()).getZ());
                 if (alternativeDifference < smallestHeightDifference) {
                     smallestHeightDifference = alternativeDifference;
-                    pose = targetPose.transformBy(target.getAlternateCameraToTarget().inverse());
+                    pose = targetPose.transformBy(target.getCameraToTarget().inverse());
                     mili = p.getFirst().getLatestResult().getLatencyMillis();
                 }
                 if (bestDifference < smallestHeightDifference) {
                     smallestHeightDifference = bestDifference;
-                    pose = targetPose.transformBy(target.getBestCameraToTarget().inverse());
+                    pose = targetPose.transformBy(target.getCameraToTarget().inverse());
                     mili = p.getFirst().getLatestResult().getLatencyMillis();
                 }
             }
@@ -245,19 +245,19 @@ public class RobotPoseEstimator {
                 double alternativeDifference = Math.abs(
                         calculateDifference(
                                 referencePose,
-                                targetPose.transformBy(target.getAlternateCameraToTarget().inverse())));
+                                targetPose.transformBy(target.getCameraToTarget().inverse())));
                 double bestDifference = Math.abs(
                         calculateDifference(
                                 referencePose,
-                                targetPose.transformBy(target.getBestCameraToTarget().inverse())));
+                                targetPose.transformBy(target.getCameraToTarget().inverse())));
                 if (alternativeDifference < smallestDifference) {
                     smallestDifference = alternativeDifference;
-                    pose = targetPose.transformBy(target.getAlternateCameraToTarget().inverse());
+                    pose = targetPose.transformBy(target.getCameraToTarget().inverse());
                     mili = p.getFirst().getLatestResult().getLatencyMillis();
                 }
                 if (bestDifference < smallestDifference) {
                     smallestDifference = bestDifference;
-                    pose = targetPose.transformBy(target.getBestCameraToTarget().inverse());
+                    pose = targetPose.transformBy(target.getCameraToTarget().inverse());
                     mili = p.getFirst().getLatestResult().getLatencyMillis();
                 }
             }
@@ -291,12 +291,12 @@ public class RobotPoseEstimator {
                             "[RobotPoseEstimator] A total ambiguity of zero exists, using that pose instead!",
                             false);
                     return Pair.of(
-                            targetPose.transformBy(target.getBestCameraToTarget().inverse()),
+                            targetPose.transformBy(target.getCameraToTarget().inverse()),
                             p.getFirst().getLatestResult().getLatencyMillis());
                 }
                 tempPoses.add(
                         Pair.of(
-                                targetPose.transformBy(target.getBestCameraToTarget().inverse()),
+                                targetPose.transformBy(target.getCameraToTarget().inverse()),
                                 Pair.of(
                                         target.getPoseAmbiguity(), p.getFirst().getLatestResult().getLatencyMillis())));
             }

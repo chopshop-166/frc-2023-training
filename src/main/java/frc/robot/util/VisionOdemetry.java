@@ -22,8 +22,8 @@ public class VisionOdemetry {
     private final Map<Integer, Pose3d> aprilTags;
 
     private boolean positionKnown = false;
-    private Pose2d tagEstimatedPose;
-    private Pose2d odometryPose;
+    private Pose2d tagEstimatedPose = new Pose2d();
+    private Pose2d odometryPose = new Pose2d();
     private final SwerveDriveMap driveMap;
 
     private final SwerveDriveOdometry odometry;
@@ -33,8 +33,6 @@ public class VisionOdemetry {
     public VisionOdemetry(String photonName, SwerveDriveMap driveMap, Transform3d cameraToRobot,
             Map<Integer, Pose3d> aprilTags) {
         this.aprilTags = aprilTags;
-
-        tagEstimatedPose = new Pose2d();
 
         this.driveMap = driveMap;
         SwerveDriveKinematics kinematics = new SwerveDriveKinematics(
@@ -60,11 +58,11 @@ public class VisionOdemetry {
                 estimatedPose.getFirst().getY(),
                 new Rotation2d(estimatedPose.getFirst().getRotation().getZ()));
 
-        odometry.update(driveMap.getGyro().getRotation2d(),
-                driveMap.getFrontLeft().getState(),
-                driveMap.getFrontRight().getState(),
-                driveMap.getRearLeft().getState(),
-                driveMap.getRearRight().getState());
+        // odometry.update(driveMap.getGyro().getRotation2d(),
+        // driveMap.getFrontLeft().getState(),
+        // driveMap.getFrontRight().getState(),
+        // driveMap.getRearLeft().getState(),
+        // driveMap.getRearRight().getState());
     }
 
     public boolean isPositionKnow() {

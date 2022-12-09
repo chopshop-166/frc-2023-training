@@ -67,14 +67,14 @@ public class Drive extends SmartSubsystemBase {
         maxRotationRadiansPerSecond = map.getMaxRotationRadianPerSecond();
 
         Transform3d cameraToRobot = new Transform3d(
-                new Translation3d(0, 0, 0),
+                new Translation3d(0, 0, Units.inchesToMeters(23)),
                 new Rotation3d(0, Units.degreesToRadians(26), 0));
 
         HashMap<Integer, Pose3d> aprilTags = new HashMap<>();
         aprilTags.put(0, new Pose3d(
                 new Translation3d(Units.inchesToMeters(64), 0, Units.inchesToMeters(
                         48)),
-                new Rotation3d(0, 0, Math.PI)));
+                new Rotation3d()));
 
         odometry = new VisionOdemetry("gloworm", map, cameraToRobot, aprilTags);
 
@@ -170,6 +170,7 @@ public class Drive extends SmartSubsystemBase {
         SmartDashboard.putNumber("robotX", robotPose.getX());
         SmartDashboard.putNumber("robotY", robotPose.getY());
         SmartDashboard.putNumber("robotAngle", robotPose.getRotation().getRadians());
+        SmartDashboard.putNumber("Testalue", testval);
     }
 
     @Override
