@@ -3,7 +3,15 @@ subsystem_class = '''package frc.robot.subsystems;
 
 import com.chopshop166.chopshoplib.commands.SmartSubsystemBase;
 
+import frc.robot.maps.subsystems.${CLASSNAME}Map;
+
 public class ${CLASSNAME} extends SmartSubsystemBase {
+
+    private ${CLASSNAME}Map map;
+
+    public ${CLASSNAME}(${CLASSNAME}Map map) {
+        this.map = map;
+    } 
 
     @Override
     public void reset() {
@@ -57,3 +65,19 @@ with open(f'{robot_path}Robot.java','w') as fp:
 
 with open(f'{robot_path}maps/subsystems/{class_name}Map.java','w') as fp:
     fp.write(subsystem_map.replace('${CLASSNAME}',class_name))
+
+with open(f'{robot_path}maps/RobotMap.java','r') as fp:
+    robot_map = fp.read()
+
+robot_map = robot_map.split('Maps')
+robot_map = f'{robot_map[0]}Maps\n    private {class_name}Map {instance_name}Map = new {class_name}Map();\n{robot_map[1]}'
+
+robot_map = robot_map.split('package frc.robot.maps;')
+robot_map = f'package frc.robot.maps;\nimport frc.robot.maps.subsystems.{class_name}Map;\n{robot_map[-1]}'
+
+robot_map = robot_map.split('Getters')
+robot_map = f'{robot_map[0]}Getters\n    public {class_name}Map get{class_name}Map() {{\n        return {instance_name}Map;\n    }} \n{robot_map[1]}'
+
+
+with open(f'{robot_path}maps/RobotMap.java','w') as fp:
+    fp.write(robot_map)
