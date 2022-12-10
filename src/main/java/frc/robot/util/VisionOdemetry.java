@@ -1,21 +1,18 @@
 package frc.robot.util;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import com.chopshop166.chopshoplib.drive.SwerveDriveMap;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.targeting.PhotonPipelineResult;
 
-import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.robot.util.RobotPoseEstimator.PoseStrategy;
 
 public class VisionOdemetry {
 
@@ -28,7 +25,8 @@ public class VisionOdemetry {
 
     private final SwerveDriveOdometry odometry;
 
-    private final RobotPoseEstimator poseEstimator;
+    private final PhotonCamera camera;
+    private final Transform3d cameraToRobot;
 
     public VisionOdemetry(String photonName, SwerveDriveMap driveMap, Transform3d cameraToRobot,
             Map<Integer, Pose3d> aprilTags) {
@@ -41,22 +39,31 @@ public class VisionOdemetry {
                 driveMap.getRearLeft().getLocation(),
                 driveMap.getRearRight().getLocation());
 
-        ArrayList<Pair<PhotonCamera, Transform3d>> allCameras = new ArrayList<>();
-        allCameras.add(new Pair<>(new PhotonCamera(NetworkTableInstance.getDefault(), photonName), cameraToRobot));
+        this.cameraToRobot = cameraToRobot;
+
+        this.camera = new PhotonCamera(NetworkTableInstance.getDefault(), photonName);
 
         odometry = new SwerveDriveOdometry(kinematics, driveMap.getGyro().getRotation2d());
-        poseEstimator = new RobotPoseEstimator(this.aprilTags, PoseStrategy.AVERAGE_BEST_TARGETS,
-                allCameras);
 
     }
 
     public void update() {
-        Pair<Pose3d, Double> estimatedPose = poseEstimator.update();
 
-        tagEstimatedPose = new Pose2d(
-                estimatedPose.getFirst().getX(),
-                estimatedPose.getFirst().getY(),
-                new Rotation2d(estimatedPose.getFirst().getRotation().getZ()));
+        PhotonPipelineResult result = camera.getLatestResult();
+        if (result.hasTargets()) {
+            Transform3d cameraToTarget = result.getBestTarget().getCameraToTarget();
+            int tagId = result.getBestTarget().getFiducialId();
+            Pose3d fieldToRobot = aprilTags.get(tagId).plus(cameraToTarget.inverse())
+                    .plus(cameraToRobot);
+
+            tagEstimatedPose = fieldToRobot.toPose2d();
+            // driveMap.getGyro().setAngle(tagEstimatedPose.getRotation().getDegrees());
+            // tagEstimatedPose = new Pose2d(
+            // fieldToRobot.getX(),
+            // fieldToRobot.getY(),
+            // new Rotation2d(fieldToRobot.getRotation().getZ()));
+            // odometry.resetPosition(new Pose2d(), driveMap.getGyro().getRotation2d());
+        }
 
         // odometry.update(driveMap.getGyro().getRotation2d(),
         // driveMap.getFrontLeft().getState(),
