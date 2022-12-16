@@ -43,7 +43,7 @@ public class Drive extends SmartSubsystemBase {
 
     private PhotonCamera camera = new PhotonCamera(NetworkTableInstance.getDefault(), "gloworm");
 
-    private double speedCoef = 0.5;
+    private double speedCoef = 0.1;
 
     private double rotationOffset = 0.0;
     private double startingRotation = 0.0;
@@ -71,14 +71,9 @@ public class Drive extends SmartSubsystemBase {
                 new Rotation3d(0, Units.degreesToRadians(26), 0));
 
         HashMap<Integer, Pose3d> aprilTags = new HashMap<>();
-        aprilTags.put(1, new Pose3d(
-                new Translation3d(Units.inchesToMeters(161), Units.inchesToMeters(22), Units.inchesToMeters(
-                        64)),
-                new Rotation3d(0, 0, Math.PI)));
-
-        aprilTags.put(3, new Pose3d(
-                new Translation3d(Units.inchesToMeters(161), Units.inchesToMeters(-16), Units.inchesToMeters(
-                        64)),
+        aprilTags.put(0, new Pose3d(
+                new Translation3d(Units.inchesToMeters(64), Units.inchesToMeters(0), Units.inchesToMeters(
+                        48)),
                 new Rotation3d(0, 0, Math.PI)));
 
         odometry = new VisionOdemetry("gloworm", map, cameraToRobot, aprilTags);
@@ -168,8 +163,6 @@ public class Drive extends SmartSubsystemBase {
         rearRight.setDesiredState(states[3]);
     }
 
-    // int testval = 0;
-
     @Override
     public void periodic() {
         odometry.update();
@@ -177,7 +170,6 @@ public class Drive extends SmartSubsystemBase {
         SmartDashboard.putNumber("robotX", robotPose.getX());
         SmartDashboard.putNumber("robotY", robotPose.getY());
         SmartDashboard.putNumber("robotAngle", robotPose.getRotation().getRadians());
-        // SmartDashboard.putNumber("test value", testval++);
     }
 
     @Override

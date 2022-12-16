@@ -6,15 +6,18 @@ import com.chopshop166.chopshoplib.commands.CommandRobot;
 import com.chopshop166.chopshoplib.commands.SmartSubsystem;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.maps.OffAxisMap;
 import frc.robot.maps.RobotMap;
 import frc.robot.subsystems.Drive;
+import frc.robot.subsystems.Shooter;
 
 public class Robot extends CommandRobot {
 
     private RobotMap map = new OffAxisMap();
     private Drive drive = new Drive(map.getDriveMap());
+    private Shooter shooter = new Shooter(map.getShooterMap());
     private final ButtonXboxController driveController = new ButtonXboxController(0);
 
     @Override
@@ -30,13 +33,8 @@ public class Robot extends CommandRobot {
     @Override
     public void configureButtonBindings() {
         driveController.a().whenPressed(drive.resetGyro());
-        driveController.x().whenPressed(instant("", () -> {
-            drive.setDriverMode(true);
-        }));
+        driveController.b().whenPressed(shooter.shoot(() -> SmartDashboard.getNumber("Shoot Speed", 0)));
 
-        driveController.y().whenPressed(instant("", () -> {
-            drive.setDriverMode(false);
-        }));
     }
 
     @Override

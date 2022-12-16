@@ -8,16 +8,45 @@ import com.chopshop166.chopshoplib.sensors.gyro.PigeonGyro;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANSparkMaxLowLevel.PeriodicFrame;
 
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
+import frc.robot.maps.subsystems.ShooterMap;
 
 @RobotMapFor("00:80:2F:19:7B:A3")
 public class OffAxisMap extends RobotMap {
 
     final PigeonGyro pigeonGyro = new PigeonGyro(new PigeonIMU(5));
+
+    @Override
+    public ShooterMap getShooterMap() {
+        final CSSparkMax shooterA = new CSSparkMax(13, MotorType.kBrushless);
+        final CSSparkMax shooterB = new CSSparkMax(14, MotorType.kBrushless);
+        final CSSparkMax feedMotor = new CSSparkMax(11, MotorType.kBrushless);
+
+        final var rawFeedMotor = feedMotor.getMotorController();
+        final var rawMotorA = shooterA.getMotorController();
+        final var rawMotorB = shooterB.getMotorController();
+
+        rawMotorA.setIdleMode(IdleMode.kCoast);
+        rawMotorA.setInverted(true);
+        rawMotorB.setIdleMode(IdleMode.kCoast);
+        rawMotorB.follow(rawMotorA, true);
+
+        rawMotorA.getPIDController().setP(0.002);
+        rawMotorA.getPIDController().setI(0);
+        rawMotorA.getPIDController().setD(0.001);
+
+        shooterA.setControlType(ControlType.kVelocity);
+
+        rawFeedMotor.setIdleMode(IdleMode.kCoast);
+
+        return new ShooterMap(shooterA, feedMotor);
+    }
 
     @Override
     public SwerveDriveMap getDriveMap() {
