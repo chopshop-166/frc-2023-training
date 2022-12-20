@@ -44,40 +44,47 @@ public class ${CLASSNAME}Map {
 }
 '''
 
+def insert_into(filename: str, keyword: str, line:str, before:bool = False):
+    with open(f'{robot_path}{filename}','r') as fp:
+        contents = fp.read()
+    prev, after = contents.split(keyword)
+    if before:
+        new_contents = f'{prev}\n{line}\n{keyword}{after}'
+    else:
+        new_contents = f'{prev}{keyword}\n{line}\n{after}'
+    with open(filename,'w') as fp:
+        fp.write(new_contents)
+
+def save_template(filename, template, **kwargs):
+    new_template = template
+    for key, value in kwargs.items():
+        new_template = new_template.replace(f'${{{key}}}',value)
+
+    with open(f'{robot_path}{filename}','w') as fp:
+        fp.write(new_template)
+
 class_name = input('Subsystem Class Name: ')
 instance_name = class_name[0].lower() + class_name[1:]
 
-with open(f'{robot_path}subsystems/{class_name}.java', 'w') as fp:
-    fp.write(subsystem_class.replace('${CLASSNAME}',class_name))
 
-with open(f'{robot_path}Robot.java','r') as fp:
-    robot_class = fp.read()
+save_template(f'subsystems/{class_name}.java',subsystem_class,CLASSNAME=class_name)
 
-robot_class = robot_class.split('Subsystems')
-robot_class = f'{robot_class[0]}Subsystems\n    {class_name} {instance_name} = new {class_name}(map.get{class_name}Map());\n{robot_class[1]}'
+insert_into(f'Robot.java', 'Subsystems', f'    {class_name} {instance_name} = new {class_name}(map.get{class_name}Map());')
 
-robot_class = robot_class.split('public class Robot')
-
-robot_class = f'{robot_class[0]}import frc.robot.subsystems.{class_name};\npublic class Robot{robot_class[1]}'
-
-with open(f'{robot_path}Robot.java','w') as fp:
-    fp.write(robot_class)
-
-with open(f'{robot_path}maps/subsystems/{class_name}Map.java','w') as fp:
-    fp.write(subsystem_map.replace('${CLASSNAME}',class_name))
-
-with open(f'{robot_path}maps/RobotMap.java','r') as fp:
-    robot_map = fp.read()
-
-robot_map = robot_map.split('Maps')
-robot_map = f'{robot_map[0]}Maps\n    private {class_name}Map {instance_name}Map = new {class_name}Map();\n{robot_map[1]}'
-
-robot_map = robot_map.split('package frc.robot.maps;')
-robot_map = f'package frc.robot.maps;\nimport frc.robot.maps.subsystems.{class_name}Map;\n{robot_map[-1]}'
-
-robot_map = robot_map.split('Getters')
-robot_map = f'{robot_map[0]}Getters\n    public {class_name}Map get{class_name}Map() {{\n        return {instance_name}Map;\n    }} \n{robot_map[1]}'
+insert_into(f'Robot.java', 'public class Robot', f'import frc.robot.subsystems.{class_name};', True)
 
 
-with open(f'{robot_path}maps/RobotMap.java','w') as fp:
-    fp.write(robot_map)
+
+save_template(f'maps/subsystems/{class_name}Map.java', subsystem_map, CLASSNAME=class_name)
+
+
+insert_into(f'maps/RobotMap.java', 'Maps',
+f'    private {class_name}Map {instance_name}Map = new {class_name}Map();')
+
+insert_into(f'maps/RobotMap.java', 'Getters',
+f'    public {class_name}Map get{class_name}Map() {{\n        return {instance_name}Map;\n    }}')
+
+insert_into(f'maps/RobotMap.java', 'package frc.robot.maps;',
+f'import frc.robot.maps.subsystems.{class_name}Map;')
+
+    
