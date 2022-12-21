@@ -16,7 +16,7 @@ public class Robot extends CommandRobot {
 
     private Counter counter = new Counter();
     private Claw claw = new Claw(map.getClawMap());
-    private Auto auto = new Auto();
+    private Auto auto = new Auto(claw);
 
     @Autonomous(defaultAuto = true)
     public CommandBase exampleAuto = auto.exampleAuto();
