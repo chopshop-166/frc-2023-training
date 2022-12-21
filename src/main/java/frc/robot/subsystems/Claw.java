@@ -1,38 +1,36 @@
 package frc.robot.subsystems;
 
 import com.chopshop166.chopshoplib.commands.SmartSubsystemBase;
-import com.chopshop166.chopshoplib.digital.DigitalInputSource;
-import com.chopshop166.chopshoplib.digital.MockDigitalInput;
-import com.chopshop166.chopshoplib.pneumatics.IDSolenoid;
-import com.chopshop166.chopshoplib.pneumatics.MockDSolenoid;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.maps.subsystems.ClawMap;
 
 public class Claw extends SmartSubsystemBase {
 
-    private IDSolenoid solenoid = new MockDSolenoid();
+    private ClawMap map;
 
-    // true = object in claw
-    private DigitalInputSource sensor = new MockDigitalInput();
+    public Claw(final ClawMap map) {
+        this.map = map;
+    }
 
     public CommandBase open() {
         return instant("Open", () -> {
-            solenoid.set(Value.kForward);
+            map.getSolenoid().set(Value.kForward);
         });
     }
 
     public CommandBase close() {
         return instant("Close", () -> {
-            solenoid.set(Value.kReverse);
+            map.getSolenoid().set(Value.kReverse);
         });
     }
 
     public CommandBase grab() {
         return cmd("Grab").onInitialize(() -> {
-            solenoid.set(Value.kForward);
-        }).runsUntil(sensor).onEnd(() -> {
-            solenoid.set(Value.kReverse);
+            map.getSolenoid().set(Value.kForward);
+        }).runsUntil(map.getSensor()).onEnd(() -> {
+            map.getSolenoid().set(Value.kReverse);
         });
     }
 
