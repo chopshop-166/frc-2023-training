@@ -14,7 +14,7 @@ public class Shooter extends SmartSubsystemBase {
     private final SmartMotorController shootMotor;
     private final SmartMotorController feedMotor;
 
-    private final double feedSpeed = 0.5;
+    private final double feedSpeed = 1.0;
     private double setPoint = 0;
 
     public Shooter(ShooterMap map) {

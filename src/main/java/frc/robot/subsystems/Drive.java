@@ -72,9 +72,14 @@ public class Drive extends SmartSubsystemBase {
 
         HashMap<Integer, Pose3d> aprilTags = new HashMap<>();
         aprilTags.put(0, new Pose3d(
-                new Translation3d(Units.inchesToMeters(64), Units.inchesToMeters(0), Units.inchesToMeters(
-                        48)),
+                new Translation3d(Units.inchesToMeters(0), Units.inchesToMeters(0), Units.inchesToMeters(
+                        32)),
                 new Rotation3d(0, 0, Math.PI)));
+
+        aprilTags.put(1, new Pose3d(
+                new Translation3d(Units.inchesToMeters(-20), Units.inchesToMeters(-44), Units.inchesToMeters(
+                        60)),
+                new Rotation3d(0, 0, Math.PI / 2)));
 
         odometry = new VisionOdemetry("gloworm", map, cameraToRobot, aprilTags);
 
@@ -120,7 +125,8 @@ public class Drive extends SmartSubsystemBase {
                 * speedCoef;
         final double translateYSpeed = deadband.applyAsDouble(translateY.getAsDouble()) * maxDriveSpeedMetersPerSecond
                 * speedCoef;
-        final double rotationSpeed = deadband.applyAsDouble(rotation.getAsDouble()) * maxRotationRadiansPerSecond;
+        final double rotationSpeed = deadband.applyAsDouble(rotation.getAsDouble()) * maxRotationRadiansPerSecond
+                * speedCoef;
 
         // rotationOffset is temporary and startingRotation is set at the start
         final ChassisSpeeds speeds = ChassisSpeeds.fromFieldRelativeSpeeds(translateYSpeed, translateXSpeed,
@@ -170,6 +176,10 @@ public class Drive extends SmartSubsystemBase {
         SmartDashboard.putNumber("robotX", robotPose.getX());
         SmartDashboard.putNumber("robotY", robotPose.getY());
         SmartDashboard.putNumber("robotAngle", robotPose.getRotation().getRadians());
+
+        SmartDashboard.putNumber("tagX", odometry.debugTag.getTranslation().getX());
+        SmartDashboard.putNumber("tagY", odometry.debugTag.getTranslation().getY());
+        SmartDashboard.putNumber("tagZ", odometry.debugTag.getTranslation().getZ());
     }
 
     @Override

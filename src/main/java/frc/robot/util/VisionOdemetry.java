@@ -19,11 +19,12 @@ public class VisionOdemetry {
     private final Map<Integer, Pose3d> aprilTags;
 
     private boolean positionKnown = false;
-    private Pose2d tagEstimatedPose = new Pose2d();
     private Pose2d odometryPose = new Pose2d();
     private final SwerveDriveMap driveMap;
 
     private final SwerveDriveOdometry odometry;
+
+    public Transform3d debugTag = new Transform3d();
 
     private final PhotonCamera camera;
     private final Transform3d cameraToRobot;
@@ -51,25 +52,23 @@ public class VisionOdemetry {
 
         PhotonPipelineResult result = camera.getLatestResult();
         if (result.hasTargets()) {
-            Transform3d cameraToTarget = result.getBestTarget().getCameraToTarget();
+            Transform3d cameraToTarget = result.getBestTarget().getBestCameraToTarget();
+            debugTag = cameraToTarget;
             int tagId = result.getBestTarget().getFiducialId();
             Pose3d fieldToRobot = aprilTags.get(tagId).plus(cameraToTarget.inverse())
-                    .plus(cameraToRobot);
+                    .plus(cameraToRobot.inverse());
 
-            tagEstimatedPose = fieldToRobot.toPose2d();
-            // driveMap.getGyro().setAngle(tagEstimatedPose.getRotation().getDegrees());
-            // tagEstimatedPose = new Pose2d(
-            // fieldToRobot.getX(),
-            // fieldToRobot.getY(),
-            // new Rotation2d(fieldToRobot.getRotation().getZ()));
-            // odometry.resetPosition(new Pose2d(), driveMap.getGyro().getRotation2d());
+            Pose2d tagEstimatedPose = fieldToRobot.toPose2d();
+
+            driveMap.getGyro().setAngle(tagEstimatedPose.getRotation().getDegrees());
+            odometry.resetPosition(tagEstimatedPose, driveMap.getGyro().getRotation2d());
         }
 
-        // odometry.update(driveMap.getGyro().getRotation2d(),
-        // driveMap.getFrontLeft().getState(),
-        // driveMap.getFrontRight().getState(),
-        // driveMap.getRearLeft().getState(),
-        // driveMap.getRearRight().getState());
+        odometryPose = odometry.update(driveMap.getGyro().getRotation2d(),
+                driveMap.getFrontLeft().getState(),
+                driveMap.getFrontRight().getState(),
+                driveMap.getRearLeft().getState(),
+                driveMap.getRearRight().getState());
     }
 
     public boolean isPositionKnow() {
@@ -77,10 +76,7 @@ public class VisionOdemetry {
     }
 
     public Pose2d getPose() {
-        return new Pose2d(
-                tagEstimatedPose.getX() + odometryPose.getX(),
-                tagEstimatedPose.getY() + odometryPose.getY(),
-                tagEstimatedPose.getRotation().plus(odometryPose.getRotation()));
+        return odometryPose;
     }
 
 }

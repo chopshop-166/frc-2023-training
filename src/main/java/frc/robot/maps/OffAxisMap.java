@@ -20,8 +20,6 @@ import frc.robot.maps.subsystems.ShooterMap;
 @RobotMapFor("00:80:2F:19:7B:A3")
 public class OffAxisMap extends RobotMap {
 
-    final PigeonGyro pigeonGyro = new PigeonGyro(new PigeonIMU(5));
-
     @Override
     public ShooterMap getShooterMap() {
         final CSSparkMax shooterA = new CSSparkMax(13, MotorType.kBrushless);
@@ -53,6 +51,7 @@ public class OffAxisMap extends RobotMap {
         // Value taken from CAD as offset from center of module base pulley to center
         // of the robot
         final double MODULE_OFFSET_XY = 0.381;
+        final PigeonGyro pigeonGyro = new PigeonGyro(new PigeonIMU(5));
 
         final CSSparkMax frontLeftSteer = new CSSparkMax(2, MotorType.kBrushless);
         final CSSparkMax frontRightSteer = new CSSparkMax(4, MotorType.kBrushless);
