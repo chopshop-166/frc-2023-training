@@ -32,7 +32,11 @@ public class Drive extends SmartSubsystemBase {
       });
   }
 
-  public CommandBase driveDistance(double distance)
+  public CommandBase driveDistance(double distance){
+      return running("driveDistance", () -> {
+          differentialDrive.dr
+      })
+  }
 
   @Override
   public void reset() {

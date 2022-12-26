@@ -1,21 +1,20 @@
 package frc.robot;
 
-import java.util.function.DoubleSupplier;
-
 import com.chopshop166.chopshoplib.Autonomous;
 import com.chopshop166.chopshoplib.commands.CommandRobot;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 
-
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.maps.RobotMap;
+import frc.robot.maps.ValkyrieMap;
 import frc.robot.subsystems.Claw;
 import frc.robot.subsystems.Drive;
 
 public class Robot extends CommandRobot {
+    private RobotMap map = new ValkyrieMap();
 
     private Auto auto = new Auto();
-    private Claw claw = new Claw();
+    private Claw claw = new Claw(map.getClawMap());
     private Drive drive = new Drive();
 
     @Autonomous(defaultAuto = true)
