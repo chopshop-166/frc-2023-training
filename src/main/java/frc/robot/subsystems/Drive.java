@@ -26,7 +26,7 @@ import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.util.DrivePID;
-import frc.robot.util.VisionOdemetry;
+import frc.robot.util.SwerveVisionPoseEstimator;
 
 public class Drive extends SmartSubsystemBase {
 
@@ -48,7 +48,7 @@ public class Drive extends SmartSubsystemBase {
     private double rotationOffset = 0.0;
     private double startingRotation = 0.0;
 
-    private final VisionOdemetry odometry;
+    private final SwerveVisionPoseEstimator poseEstimator;
     private Pose2d robotPose = new Pose2d();
 
     // DrivePID drivePid = new DrivePID(0.4, 0, 0, 0.3, 0, 0.1);
@@ -82,7 +82,7 @@ public class Drive extends SmartSubsystemBase {
                         60)),
                 new Rotation3d(0, 0, Math.PI / 2)));
 
-        odometry = new VisionOdemetry("gloworm", map, cameraToRobot, aprilTags);
+        poseEstimator = new SwerveVisionPoseEstimator("gloworm", map, cameraToRobot, aprilTags);
 
     }
 
@@ -173,15 +173,15 @@ public class Drive extends SmartSubsystemBase {
 
     @Override
     public void periodic() {
-        odometry.update();
-        robotPose = odometry.getPose();
+        poseEstimator.update();
+        robotPose = poseEstimator.getPose();
         SmartDashboard.putNumber("robotX", robotPose.getX());
         SmartDashboard.putNumber("robotY", robotPose.getY());
         SmartDashboard.putNumber("robotAngle", robotPose.getRotation().getRadians());
 
-        SmartDashboard.putNumber("tagX", odometry.debugTag.getTranslation().getX());
-        SmartDashboard.putNumber("tagY", odometry.debugTag.getTranslation().getY());
-        SmartDashboard.putNumber("tagZ", odometry.debugTag.getTranslation().getZ());
+        SmartDashboard.putNumber("tagX", poseEstimator.debugTag.getTranslation().getX());
+        SmartDashboard.putNumber("tagY", poseEstimator.debugTag.getTranslation().getY());
+        SmartDashboard.putNumber("tagZ", poseEstimator.debugTag.getTranslation().getZ());
 
     }
 

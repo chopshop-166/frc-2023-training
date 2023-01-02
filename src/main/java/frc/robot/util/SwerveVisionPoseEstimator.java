@@ -15,7 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public class VisionOdemetry {
+public class SwerveVisionPoseEstimator {
 
     private final Map<Integer, Pose3d> aprilTags;
 
@@ -30,7 +30,7 @@ public class VisionOdemetry {
     private final PhotonCamera camera;
     private final Transform3d cameraToRobot;
 
-    public VisionOdemetry(String photonName, SwerveDriveMap driveMap, Transform3d cameraToRobot,
+    public SwerveVisionPoseEstimator(String photonName, SwerveDriveMap driveMap, Transform3d cameraToRobot,
             Map<Integer, Pose3d> aprilTags) {
         this.aprilTags = aprilTags;
 
