@@ -51,7 +51,8 @@ public class Drive extends SmartSubsystemBase {
     private final VisionOdemetry odometry;
     private Pose2d robotPose = new Pose2d();
 
-    DrivePID drivePid = new DrivePID(0, 0, 0, 0, 0, 0);
+    // DrivePID drivePid = new DrivePID(0.4, 0, 0, 0.3, 0, 0.1);
+    DrivePID drivePid = new DrivePID(0.4, 0, 0, 0.4, 0, 0);
 
     public Drive(
             final SwerveDriveMap map) {
@@ -110,7 +111,8 @@ public class Drive extends SmartSubsystemBase {
     public CommandBase driveTo(Pose2d targetPose) {
         return cmd("Drive To").onExecute(() -> {
             Transform2d velocities = drivePid.calculate(robotPose, targetPose);
-            updateSwerveSpeedAngle(velocities::getX, velocities::getY, () -> velocities.getRotation().getRadians());
+            updateSwerveSpeedAngle(() -> velocities.getX(), () -> velocities.getY(),
+                    () -> velocities.getRotation().getRadians());
 
         }).runsUntil(() -> drivePid.getError(robotPose, targetPose) < 0.1).onEnd(
                 () -> {
@@ -180,6 +182,7 @@ public class Drive extends SmartSubsystemBase {
         SmartDashboard.putNumber("tagX", odometry.debugTag.getTranslation().getX());
         SmartDashboard.putNumber("tagY", odometry.debugTag.getTranslation().getY());
         SmartDashboard.putNumber("tagZ", odometry.debugTag.getTranslation().getZ());
+
     }
 
     @Override

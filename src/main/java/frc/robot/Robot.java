@@ -6,6 +6,8 @@ import com.chopshop166.chopshoplib.commands.CommandRobot;
 import com.chopshop166.chopshoplib.commands.SmartSubsystem;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.maps.OffAxisMap;
@@ -34,7 +36,8 @@ public class Robot extends CommandRobot {
     public void configureButtonBindings() {
         driveController.a().whenPressed(drive.resetGyro());
         driveController.b().whenPressed(shooter.shoot(() -> SmartDashboard.getNumber("Shoot Speed", 0)));
-
+        driveController.x().whenPressed(drive.driveTo(
+                new Pose2d(2, -1, Rotation2d.fromDegrees(180))));
     }
 
     @Override

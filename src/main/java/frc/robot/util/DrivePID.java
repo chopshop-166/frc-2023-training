@@ -20,10 +20,11 @@ public class DrivePID {
     public Transform2d calculate(Pose2d currentPose, Pose2d targetPose) {
         return new Transform2d(
                 new Translation2d(
-                        xPid.calculate(targetPose.getX() - currentPose.getX()),
-                        yPid.calculate(targetPose.getY() - currentPose.getY())),
+                        yPid.calculate(currentPose.getY() - targetPose
+                                .getY()),
+                        xPid.calculate(currentPose.getX() - targetPose.getX())),
                 new Rotation2d(anglePid
-                        .calculate(targetPose.getRotation().getRadians() - currentPose.getRotation().getRadians())));
+                        .calculate(currentPose.getRotation().getRadians() - targetPose.getRotation().getRadians())));
     }
 
     public double getError(Pose2d currentPose, Pose2d targetPose) {

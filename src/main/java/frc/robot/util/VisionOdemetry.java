@@ -9,6 +9,7 @@ import org.photonvision.targeting.PhotonPipelineResult;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -60,11 +61,16 @@ public class VisionOdemetry {
 
             Pose2d tagEstimatedPose = fieldToRobot.toPose2d();
 
-            driveMap.getGyro().setAngle(tagEstimatedPose.getRotation().getDegrees());
+            tagEstimatedPose = new Pose2d(-tagEstimatedPose.getX(), -tagEstimatedPose.getY(),
+                    tagEstimatedPose.getRotation());
+            // driveMap.getGyro().setAngle(-tagEstimatedPose.getRotation().getDegrees() -
+            // 180);
+            driveMap.getGyro().reset();
             odometry.resetPosition(tagEstimatedPose, driveMap.getGyro().getRotation2d());
         }
 
-        odometryPose = odometry.update(driveMap.getGyro().getRotation2d(),
+        odometryPose = odometry.update(
+                Rotation2d.fromDegrees(driveMap.getGyro().getAngle() - 180),
                 driveMap.getFrontLeft().getState(),
                 driveMap.getFrontRight().getState(),
                 driveMap.getRearLeft().getState(),
