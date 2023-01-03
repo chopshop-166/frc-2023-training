@@ -51,7 +51,7 @@ def insert_into(filename: str, keyword: str, line:str, before:bool = False):
         new_contents = contents.replace( keyword, f'\n{line}\n{keyword}'  )
     else:
         new_contents = contents.replace(keyword, f'{keyword}\n{line}\n')
-    with open(f'{robot_path}{filename},'w') as fp:
+    with open(f'{robot_path}{filename}','w') as fp:
         fp.write(new_contents)
 
 def save_template(filename, template, **kwargs):
