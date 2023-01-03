@@ -63,6 +63,11 @@ def save_template(filename, template, **kwargs):
         fp.write(new_template)
 
 class_name = input('Subsystem Class Name: ')
+
+# Make sure that it is a proper class name
+class_name = ''.join( list(map(lambda s: s[0].upper() + s[1:], class_name.split())) )
+
+
 instance_name = class_name[0].lower() + class_name[1:]
 
 
