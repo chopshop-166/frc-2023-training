@@ -47,11 +47,10 @@ public class ${CLASSNAME}Map {
 def insert_into(filename: str, keyword: str, line:str, before:bool = False):
     with open(f'{robot_path}{filename}','r') as fp:
         contents = fp.read()
-    prev, after = contents.split(keyword)
     if before:
-        new_contents = f'{prev}\n{line}\n{keyword}{after}'
+        new_contents = contents.replace( keyword, f'\n{line}\n{keyword}'  )
     else:
-        new_contents = f'{prev}{keyword}\n{line}\n{after}'
+        new_contents = contents.replace(keyword, f'{keyword}\n{line}\n')
     with open(filename,'w') as fp:
         fp.write(new_contents)
 
@@ -69,22 +68,22 @@ instance_name = class_name[0].lower() + class_name[1:]
 
 save_template(f'subsystems/{class_name}.java',subsystem_class,CLASSNAME=class_name)
 
-insert_into(f'Robot.java', 'Subsystems', f'    {class_name} {instance_name} = new {class_name}(map.get{class_name}Map());')
+insert_into(f'Robot.java', '$Subsystems$', f'    {class_name} {instance_name} = new {class_name}(map.get{class_name}Map());')
 
-insert_into(f'Robot.java', 'public class Robot', f'import frc.robot.subsystems.{class_name};', True)
+insert_into(f'Robot.java', '$Imports$', f'import frc.robot.subsystems.{class_name};')
 
 
 
 save_template(f'maps/subsystems/{class_name}Map.java', subsystem_map, CLASSNAME=class_name)
 
 
-insert_into(f'maps/RobotMap.java', 'Maps',
+insert_into(f'maps/RobotMap.java', '$Maps$',
 f'    private {class_name}Map {instance_name}Map = new {class_name}Map();')
 
-insert_into(f'maps/RobotMap.java', 'Getters',
+insert_into(f'maps/RobotMap.java', '$Getters$',
 f'    public {class_name}Map get{class_name}Map() {{\n        return {instance_name}Map;\n    }}')
 
-insert_into(f'maps/RobotMap.java', 'package frc.robot.maps;',
+insert_into(f'maps/RobotMap.java', '$Imports$',
 f'import frc.robot.maps.subsystems.{class_name}Map;')
 
     
