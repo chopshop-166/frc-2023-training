@@ -1,4 +1,4 @@
-robot_path = "src/main/java/frc/robot/"
+robot_path = "src/main/java/frc/robot"
 subsystem_class = """package frc.robot.subsystems;
 
 import com.chopshop166.chopshoplib.commands.SmartSubsystemBase;
@@ -46,14 +46,14 @@ public class ${CLASSNAME}Map {
 
 
 def insert_into(filename: str, keyword: str, line: str, before: bool = False):
-    with open(f"{robot_path}{filename}", "r") as fp:
+    with open(f"{robot_path}/{filename}", "r") as fp:
         contents = fp.read()
     if before:
-        new_contents = contents.replace(keyword, f"\n{line}\n{keyword}")
+        to_replace = f"\n{line}\n{keyword}"
     else:
-        new_contents = contents.replace(keyword, f"{keyword}\n{line}\n")
-    with open(f"{robot_path}{filename}", "w") as fp:
-        fp.write(new_contents)
+        to_replace = f"{keyword}\n{line}\n"
+    with open(f"{robot_path}/{filename}", "w") as fp:
+        fp.write(contents.replace(keyword, to_replace))
 
 
 def save_template(filename, template, **kwargs):
@@ -61,14 +61,14 @@ def save_template(filename, template, **kwargs):
     for key, value in kwargs.items():
         new_template = new_template.replace(f"${{{key}}}", value)
 
-    with open(f"{robot_path}{filename}", "w") as fp:
+    with open(f"{robot_path}/{filename}", "w") as fp:
         fp.write(new_template)
 
 
 class_name = input("Subsystem Class Name: ")
 
 # Make sure that it is a proper class name
-class_name = "".join(list(map(lambda s: s[0].upper() + s[1:], class_name.split())))
+class_name = "".join((s[0].upper() + s[1:]) for s in class_name.split())
 
 
 instance_name = class_name[0].lower() + class_name[1:]
