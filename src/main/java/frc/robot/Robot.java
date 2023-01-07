@@ -1,5 +1,6 @@
 package frc.robot;
 
+import com.chopshop166.chopshoplib.Autonomous;
 import java.util.stream.Stream;
 
 import com.chopshop166.chopshoplib.commands.CommandRobot;
@@ -14,13 +15,22 @@ import frc.robot.maps.OffAxisMap;
 import frc.robot.maps.RobotMap;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Shooter;
+import frc.robot.maps.RobotMap;
+// $Imports$
 
 public class Robot extends CommandRobot {
 
+    private Auto auto = new Auto();
+    private RobotMap map = new RobotMap();
     private RobotMap map = new OffAxisMap();
     private Drive drive = new Drive(map.getDriveMap());
     private Shooter shooter = new Shooter(map.getShooterMap());
     private final ButtonXboxController driveController = new ButtonXboxController(0);
+
+    // $Subsystems$
+
+    @Autonomous(defaultAuto = true)
+    public CommandBase exampleAuto = auto.exampleAuto();
 
     @Override
     public void teleopInit() {
@@ -49,10 +59,5 @@ public class Robot extends CommandRobot {
     public void setDefaultCommands() {
         drive.setDefaultCommand(drive.fieldCentricDrive(driveController::getLeftX, driveController::getLeftY,
                 driveController::getRightX));
-    }
-
-    public CommandBase safeStateSubsystems(final SmartSubsystem... subsystems) {
-        return parallel("Reset Subsystems",
-                Stream.of(subsystems).map(SmartSubsystem::safeStateCmd).toArray(CommandBase[]::new));
     }
 }
