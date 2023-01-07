@@ -1,10 +1,10 @@
 package frc.robot;
 
-import com.chopshop166.chopshoplib.commands.Commandable;
+import static edu.wpi.first.wpilibj2.command.Commands.runOnce;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-public class Auto implements Commandable {
+public class Auto {
     // Declare copies of subsystems
 
     // Pass in all subsystems
@@ -13,7 +13,7 @@ public class Auto implements Commandable {
     }
 
     public CommandBase exampleAuto() {
-        return instant("", () -> {
+        return runOnce(() -> {
         });
     }
 

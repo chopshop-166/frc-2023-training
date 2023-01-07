@@ -23,6 +23,20 @@
         "**/.factorypath": true,
         "**/*~": true
     },
+    "java.completion.favoriteStaticMembers": [
+        "org.junit.Assert.*",
+        "org.junit.Assume.*",
+        "org.junit.jupiter.api.Assertions.*",
+        "org.junit.jupiter.api.Assumptions.*",
+        "org.junit.jupiter.api.DynamicContainer.*",
+        "org.junit.jupiter.api.DynamicTest.*",
+        "org.mockito.Mockito.*",
+        "org.mockito.ArgumentMatchers.*",
+        "org.mockito.Answers.*",
+        "edu.wpi.first.wpilibj2.command.Commands.*",
+        "com.chopshop166.chopshoplib.commands.Commands.*"
+    ],
+    "java.compile.nullAnalysis.mode": "automatic",
     "java.test.config": [
         {
             "name": "WPIlibUnitTests",
