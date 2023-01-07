@@ -17,11 +17,11 @@ public class Robot extends CommandRobot {
 
     private Auto auto = new Auto();
     private RobotMap map = new OffAxisMap();
-    private Drive drive = new Drive(map.getDriveMap());
-    private Shooter shooter = new Shooter(map.getShooterMap());
     private final ButtonXboxController driveController = new ButtonXboxController(0);
 
     // $Subsystems$
+    private Drive drive = new Drive(map.getDriveMap());
+    private Shooter shooter = new Shooter(map.getShooterMap());
 
     @Autonomous(defaultAuto = true)
     public CommandBase exampleAuto = auto.exampleAuto();
