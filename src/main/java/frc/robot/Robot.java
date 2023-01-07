@@ -1,10 +1,7 @@
 package frc.robot;
 
 import com.chopshop166.chopshoplib.Autonomous;
-import java.util.stream.Stream;
-
 import com.chopshop166.chopshoplib.commands.CommandRobot;
-import com.chopshop166.chopshoplib.commands.SmartSubsystem;
 import com.chopshop166.chopshoplib.controls.ButtonXboxController;
 
 import edu.wpi.first.math.geometry.Pose2d;
@@ -15,13 +12,10 @@ import frc.robot.maps.OffAxisMap;
 import frc.robot.maps.RobotMap;
 import frc.robot.subsystems.Drive;
 import frc.robot.subsystems.Shooter;
-import frc.robot.maps.RobotMap;
-// $Imports$
 
 public class Robot extends CommandRobot {
 
     private Auto auto = new Auto();
-    private RobotMap map = new RobotMap();
     private RobotMap map = new OffAxisMap();
     private Drive drive = new Drive(map.getDriveMap());
     private Shooter shooter = new Shooter(map.getShooterMap());
@@ -59,5 +53,6 @@ public class Robot extends CommandRobot {
     public void setDefaultCommands() {
         drive.setDefaultCommand(drive.fieldCentricDrive(driveController::getLeftX, driveController::getLeftY,
                 driveController::getRightX));
+
     }
 }
